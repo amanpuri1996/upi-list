@@ -22,3 +22,133 @@
                     <option value="@paytm">@paytm</option>
                     <option value="@ybl">@ybl</option>
                     <option value="@sib">@sib</option>
+                    
+                    
+                    function modify(b, c, s) 
+{
+  var user = sessionStorage.getItem("user");
+  localStorage.setItem("symbol", b);
+  localStorage.setItem("bidid", c);
+  localStorage.setItem("exchange", s);
+  var json_data = { "user": user, "symbol": b, "bidid": c };
+  if(s=='BUYBACK' || s == "TAKEOVER" || s == "DLST")
+  {
+    $("#withoutapi").css("display", "block");
+    $("#modifybidsubmit_nonupi").css("display", "block");
+    $("#bidsubmit_nonupi").css("display", "none");
+    var buybackmodifydata = { "user": user, "symbol":b , "userid":c};
+    $.ajax({
+      type: 'POST',
+      contentType: 'application/json; charset=utf-8',
+      url: '/ipo/bnrsecurities/modifybuyback',
+      data: JSON.stringify(buybackmodifydata),
+      success: function (data) {
+      //console.log(data)
+        var modifybiddata = '<tbody id="showbiddata_nonupi"><tr><td>Issue open</td><td>' + 
+          data['data'][0]['opendatetime'] + '</td></tr><tr><td>Issue end</td><td>' + 
+          data['data'][0]['closedatetime'] + '</td></tr><tr><td>Issue price</td><td>' + 
+          data['data'][0]['floorprice'] + '-' + data['data'][0]['ceilingprice'] + '</td></tr><tr><td>Cuttoff</td><td id="cuttoff">' + 
+          data['data'][0]['cuttoff'] + '</td></tr><tr><td>Market lot</td><td id="mrktlots">' + 
+          data['data'][0]['tradinglot'] + '</td></tr><tr><td>Tick size</td><td>' + 
+          data['data'][0]['tickprice'] + '</td></tr><tr><td>Min. order qty.</td><td>' + 
+          data['data'][0]['minbidqty'] + '</td></tr><tr><td>Discount</td><td>' + 
+          data['data'][0]['discountvalue'] + '</td></tr></tbody>';
+
+        $('#showbiddata_nonupi').replaceWith(modifybiddata);
+        sessionStorage.setItem('price_range', data["data"][0]["floorprice"] + "-" + data["data"][0]["ceilingprice"]);
+        $("#symbol_nonupi").replaceWith('<h5 id="symbol_nonupi">'+ data["data"][0]["symbol"]+'</h5>');
+        $("#mrktlot").replaceWith('<p id="mrktlot">' + data["data"][0]["tradinglot"] + "</p>");
+        $("#qty2").val(data["data"][2]);
+        $("#price2").val(data["data"][1]);
+        $("#declare-bid2").prop("checked", true);
+        var total =data["data"][2] * data["data"][1];
+        $("#total-bid2").replaceWith('<label id="total-bid2">' + total + "</label>");
+      },
+      dataType: 'json',
+    });
+  }
+
+  if(s=='BSE')
+  {
+    $('#modifybidsubmit').css('display', 'block');
+    $('#bidsubmit').css('display', 'none');
+    $('#id01').css('display', 'block');
+    $.ajax({
+      type: 'POST',
+      contentType: 'application/json; charset=utf-8',
+      url: '/ipo/bnrsecurities/modifyBID',
+      data: JSON.stringify(json_data),
+      success: function (data) {
+      //console.log(data)
+        var modifybiddata = '<tbody id="showbiddata"><tr><td>Issue open</td><td>' + 
+          data['data']['issuedetail']['opendatetime'] + '</td></tr><tr><td>Issue end</td><td>' + 
+          data['data']['issuedetail']['closedatetime'] + '</td></tr><tr><td>Issue price</td><td>' + 
+          data['data']['issuedetail']['floorprice'] + '-' + data['data']['issuedetail']['ceilingprice'] + '</td></tr><tr><td>Cuttoff</td><td id="cuttoff">' + 
+          data['data']['issuedetail']['cuttoff'] + '</td></tr><tr><td>Market lot</td><td id="mrktlots">' + 
+          data['data']['issuedetail']['tradinglot'] + '</td></tr><tr><td>Tick size</td><td>' + 
+          data['data']['issuedetail']['tickprice'] + '</td></tr><tr><td>Min. order qty.</td><td>' + 
+          data['data']['issuedetail']['minbidqty'] + '</td></tr><tr><td>Discount</td><td>' + 
+          data['data']['issuedetail']['discountvalue'] + '</td></tr></tbody>';
+        
+        $('#showbiddata').replaceWith(modifybiddata);
+        sessionStorage.setItem('price_range', data["data"]['issuedetail']["floorprice"] + "-" + data["data"]['issuedetail']["ceilingprice"]);
+        $("#exchange_symbol").replaceWith('<button class="bid_disbtn" disabled="" id="exchange_symbol">BSE</button>');
+        $('#symbol').replaceWith('<h5 id="symbol">' + data['data']['issuedetail']['symbol'] + '</h5>');
+        $('#mrktlot').replaceWith('<p id="mrktlot">' + data['data']["issuedetail"]["tradinglot"] + '</p>');
+        $('#qty1').val(data['data']['biddetail']['quantity']);
+        $('#price1').val(data['data']['biddetail']['rate']);
+        var lot_val=data['data']['biddetail']['quantity'] / data['data']["issuedetail"]["tradinglot"];
+        $('#lots1').val(lot_val);
+        var upi_str = data["data"]["biddetail"]["upi"].split("@");
+        $("#vpa1").val(upi_str["0"]);
+        $("#upiid").val("@" + upi_str["1"] + "");
+        $("#declare-bid").prop("checked", true);
+        $("#test1").prop("checked", true);
+        var total =data["data"]["biddetail"]["quantity"] * data["data"]["biddetail"]["rate"];
+        $("#total-bid").replaceWith('<label id="total-bid">' + total + "</label>");
+      },
+      dataType: 'json',
+    });
+  }
+  if(s=='NSE')
+  {
+    $('#modifybidsubmit').css('display', 'block');
+    $('#bidsubmit').css('display', 'none');
+    $('#id01').css('display', 'block');
+    $.ajax({
+      type: 'POST',
+      contentType: 'application/json; charset=utf-8',
+      url: '/ipo/bnrsecurities/modifyBID/nse',
+      data: JSON.stringify(json_data),
+      success: function (data) {
+      //console.log(data)
+        var modifybiddata = '<tbody id="showbiddata"><tr><td>Issue open</td><td>' +
+          data["data"]['issuedetail']["biddingStartDate"] + "</td></tr><tr><td>Issue end</td><td>" + 
+          data["data"]['issuedetail']["biddingEndDate"] + "</td></tr><tr><td>Issue price</td><td>" + 
+          data["data"]['issuedetail']["minPrice"] + "-" + data["data"]['issuedetail']["maxPrice"] + '</td></tr><tr><td>Cuttoff</td><td id="cuttoff">' + 
+          data["data"]['issuedetail']["cutOffPrice"] + "</td></tr><tr><td>Market lot</td><td id='mrktlots'>" + 
+          data["data"]['issuedetail']["lotSize"] + "</td></tr><tr><td>Tick size</td><td>" + 
+          data["data"]['issuedetail']["tickSize"] + "</td></tr><tr><td>Min. order qty.</td><td>" + 
+          data["data"]['issuedetail']["minBidQuantity"] + "</td></tr></tbody>";
+        
+        $('#showbiddata').replaceWith(modifybiddata);
+        sessionStorage.setItem('price_range', data["data"]['issuedetail']["minPrice"] + "-" + data["data"]['issuedetail']["maxPrice"]);
+        $("#exchange_symbol").replaceWith('<button class="bid_disbtn" disabled="" id="exchange_symbol">NSE</button>');
+        $('#symbol').replaceWith('<h5 id="symbol">' + data['data']['issuedetail']['symbol'] + '</h5>');
+        $('#mrktlot').replaceWith('<p id="mrktlot">' + data["data"]['issuedetail']["lotSize"] + '</p>');
+        $('#qty1').val(data['data']['biddetail']['quantity']);
+        $('#price1').val(data['data']['biddetail']['rate'])
+        $('#lots1').val(data['data']['biddetail']['quantity']/ data["data"]['issuedetail']["lotSize"]);
+        var upi_str = data["data"]["biddetail"]["upi"].split("@");
+        $("#vpa1").val(upi_str["0"]);
+        $("#upiid").val("@" + upi_str["1"] + "");
+        $("#declare-bid").prop("checked", true);
+        $("#test1").prop("checked", true);
+        var total =data["data"]["biddetail"]["quantity"] * data["data"]["biddetail"]["rate"];
+        $("#total-bid").replaceWith('<label id="total-bid">' + total + "</label>");
+      },
+      dataType: 'json',
+    });
+  }
+}
+
