@@ -152,3 +152,93 @@
   }
 }
 
+function modifybidsubmit() {
+  var user = sessionStorage.getItem("user");
+  var symbol = localStorage.getItem("symbol");
+  var bidid = localStorage.getItem("bidid");
+  var flagcheck=document.getElementById('test1');
+  var json_data = { "user": user, "bidid": bidid, "flagcheck":flagcheck.checked, "upi": $("#vpa1").val() + $("#upiid").val(), "quantity": $('#qty1').val(), "rate": $('#price1').val() };
+  if (localStorage.getItem("exchange") == "BUYBACK" || localStorage.getItem("exchange") == "TAKEOVER" || localStorage.getItem("exchange") == "DLST")
+  {
+    var price_val = parseFloat($('#price1').val()).toFixed(2);
+    var price_range = sessionStorage.getItem('price_range').split('-');
+    if(price_val >= parseFloat(price_range[0]) && price_val <= parseFloat(price_range[1]))
+    {
+      $(".se-pre-con").show();
+      $("#withoutapi").css("display", "none");
+      var buybackmodifydata = {'user': user, 'userid': bidid, 'symbol': symbol, 'qty': $("#qty2").val(), 'rate': $("#price2").val()};
+      //console.log(buybackmodifydata);
+      $.ajax({
+        type: "POST",
+        contentType: "application/json; charset=utf-8",
+        url: "/ipo/bnrsecurities/modifybuybacksubmit",
+        data: JSON.stringify(buybackmodifydata),
+        success: function(data) {
+          $(".se-pre-con").hide();
+          //console.log(data["data"]);
+          $("#id03").css("display", "block");
+          $("#bidsuccess").replaceWith("<p id='bidsuccess'>" + data["data"] + "</p>");
+        },
+        dataType: "json",
+      });
+    }
+    else
+    {
+      alert('please enter valid cutoff price');
+    }
+  }
+  if(localStorage.getItem("exchange")=='BSE')
+  {
+    var price_val = parseFloat($('#price1').val()).toFixed(2);
+    var price_range = sessionStorage.getItem('price_range').split('-');
+    if(price_val >= parseFloat(price_range[0]) && price_val <= parseFloat(price_range[1]))
+    {
+      $(".se-pre-con").show();
+      $('#id01').css('display', 'none');
+      $.ajax({
+        type: 'POST',
+        contentType: 'application/json; charset=utf-8',
+        url: '/ipo/bnrsecurities/modifyBIDsubmit',
+        data: JSON.stringify(json_data),
+        success: function (data) {
+          $(".se-pre-con").hide();
+          
+          $('#id03').css('display', 'block');
+          $('#bidsuccess').replaceWith("<p id='bidsuccess'>" + data['data'] + "</p>");
+        },
+        dataType: 'json',
+      });
+    }
+    else
+    {
+      alert('Please enter valid cutoff price');
+    }
+  }
+  if(localStorage.getItem("exchange")=='NSE')
+  {
+    var price_val = $("#price1").val();
+    var price_range = sessionStorage.getItem('price_range').split('-');
+    if(price_val >= parseFloat(price_range[0]) && price_val <= parseFloat(price_range[1]))
+    {
+      $(".se-pre-con").show();
+      $('#id01').css('display', 'none');
+      $.ajax({
+        type: 'POST',
+        contentType: 'application/json; charset=utf-8',
+        url: '/ipo/bnrsecurities/modifyBIDsubmit/nse',
+        data: JSON.stringify(json_data),
+        success: function (data) {
+          $(".se-pre-con").hide();
+          
+          $('#id03').css('display', 'block');
+          $('#bidsuccess').replaceWith("<p id='bidsuccess'>" + data['data'] + "</p>");
+        },
+        dataType: 'json',
+      });
+    }
+    else
+    {
+      alert('Please enter valid cuttoff price')
+    }
+  }
+}
