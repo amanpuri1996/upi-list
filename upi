@@ -1,6 +1,7 @@
                 https://www.npci.org.in/what-we-do/upi/live-ipo
   --------- ------------------------------------------------------------------------------------------------------------------------------------------------------------------
                                             <option value="@rbl">@rbl</option>
+                                            <option value="@upi">@upi</option>
                                             <option value="@allbank">@allbank</option>
                                             <option value="@aubank">@aubank</option>
                                             <option value="@axisbank">@axisbank</option>
